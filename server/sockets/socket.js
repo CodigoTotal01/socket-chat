@@ -28,6 +28,8 @@ io.on('connection', (client) => {
 
         //Notificar que se onecto un nuyevo cliente
         client.broadcast.to(data.sala).emit('listaPersona', usuarios.getPersonaPorSala(data.sala))
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${data.nombre} ingreso`));
+
 
         callback(usuarios.getPersonaPorSala(data.sala)); //? callback empleados para enviar informacion desde el servidor al cliente
 
@@ -42,11 +44,15 @@ io.on('connection', (client) => {
 
     })
     //indormacion del cliente
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
         let persona = usuarios.getPersona(client.id);
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         //emitir a todo el mundo :D 
-        client.broadcast.to(persona.sala).emit('crearMensaje', mensaje)
+        client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+        callback({
+            mensaje //enviamos informacion al fornt
+        })
     })
 
 
